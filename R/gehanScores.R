@@ -72,7 +72,41 @@ gehanScores <- function(x, y, na.rm=FALSE) {
   if(M == 0L)
     return(rep(NA_real_, N))
   # Compute the number strictly less than or strictly greater than each value
-  L <- rowSums(x[, 1L] > matrix(y[, 2L], nrow=N, ncol=M, byrow=TRUE))
-  G <- rowSums(x[, 2L] < matrix(y[, 1L], nrow=N, ncol=M, byrow=TRUE))
+
+  n_buf <- 100
+
+  cnt_buf <- M %/% n_buf
+  n_buf_end <- M %% n_buf
+
+  L <- rep(0, N)
+  G <- rep(0, N)
+  for (i in 1:cnt_buf) {
+    id_buf_first <- (i-1)*n_buf + 1
+    id_buf <- id_buf_first:(id_buf_first+n_buf-1)
+    L_buf <- rowSums(x[, 1L] > matrix(y[id_buf, 2L], nrow=N, ncol=n_buf, byrow=T))
+    L <- L + L_buf
+
+    id_buf_first <- (i-1)*n_buf + 1
+    id_buf <- id_buf_first:(id_buf_first+n_buf-1)
+    G_buf <- rowSums(x[, 2L] < matrix(y[id_buf, 1L], nrow=N, ncol=n_buf, byrow=T))
+    G <- G + G_buf
+  }
+
+  if (n_buf_end > 0) {
+    id_buf_first <- cnt_buf*n_buf + 1
+    id_buf <- id_buf_first:(id_buf_first+n_buf_end-1)
+    L_buf <- rowSums(
+      x[, 1L] > matrix(y[id_buf, 2L], nrow=N, ncol=n_buf_end, byrow=T)
+    )
+    L <- L + L_buf
+  
+    id_buf_first <- cnt_buf*n_buf + 1
+    id_buf <- id_buf_first:(id_buf_first+n_buf_end-1)
+    G_buf <- rowSums(
+      x[, 2L] < matrix(y[id_buf, 1L], nrow=N, ncol=n_buf_end, byrow=T)
+    )
+    G <- G + G_buf
+  }
+	
   return(naresid(xomit, L - G))
 }
