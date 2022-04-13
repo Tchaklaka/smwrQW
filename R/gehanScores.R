@@ -80,14 +80,14 @@ gehanScores <- function(x, y, na.rm=FALSE) {
 
   L <- rep(0, N)
   G <- rep(0, N)
+
   for (i in 1:cnt_buf) {
     id_buf_first <- (i-1)*n_buf + 1
     id_buf <- id_buf_first:(id_buf_first+n_buf-1)
+
     L_buf <- rowSums(x[, 1L] > matrix(y[id_buf, 2L], nrow=N, ncol=n_buf, byrow=T))
     L <- L + L_buf
 
-    id_buf_first <- (i-1)*n_buf + 1
-    id_buf <- id_buf_first:(id_buf_first+n_buf-1)
     G_buf <- rowSums(x[, 2L] < matrix(y[id_buf, 1L], nrow=N, ncol=n_buf, byrow=T))
     G <- G + G_buf
   }
@@ -95,13 +95,12 @@ gehanScores <- function(x, y, na.rm=FALSE) {
   if (n_buf_end > 0) {
     id_buf_first <- cnt_buf*n_buf + 1
     id_buf <- id_buf_first:(id_buf_first+n_buf_end-1)
+
     L_buf <- rowSums(
       x[, 1L] > matrix(y[id_buf, 2L], nrow=N, ncol=n_buf_end, byrow=T)
     )
     L <- L + L_buf
-  
-    id_buf_first <- cnt_buf*n_buf + 1
-    id_buf <- id_buf_first:(id_buf_first+n_buf_end-1)
+
     G_buf <- rowSums(
       x[, 2L] < matrix(y[id_buf, 1L], nrow=N, ncol=n_buf_end, byrow=T)
     )
